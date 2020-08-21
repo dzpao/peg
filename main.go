@@ -23,6 +23,7 @@ var (
 	noast    = flag.Bool("noast", false, "disable AST")
 	strict   = flag.Bool("strict", false, "treat compiler warnings as errors")
 	filename = flag.String("output", "", "specify name of output file")
+	ignorecase = flag.Bool("ignorecase",false,"generate ast for all rules, not just ones that start with a capital letter")
 )
 
 func main() {
@@ -39,8 +40,10 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	t := tree.New(*inline, *_switch, *noast)
+	t.IgnoreCase = *ignorecase // we do this to avoid having to change the function signature
 
-	p := &Peg{Tree: tree.New(*inline, *_switch, *noast), Buffer: string(buffer)}
+	p := &Peg{Tree:t, Buffer: string(buffer)}
 	p.Init(Pretty(true), Size(1<<15))
 	if err := p.Parse(); err != nil {
 		log.Fatal(err)
